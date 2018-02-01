@@ -11,9 +11,9 @@ Implemented in Python using the Selenium module.
 
 **Think this tool is worth supporting?**
 Head over to https://github.com/timgrossmann/InstaPy/wiki/How-to-Contribute to find out how you can help.
-**Become a part of InstaPy!**  
+**Become a part of InstaPy!**
 
-**Have an issue**
+**Have an issue?**
 Head over to https://github.com/timgrossmann/InstaPy/wiki/Reporting-An-Issue to find out how to report this to us and get help.
 
 **Disclaimer**: Please Note that this is a research project. I am by no means responsible for any usage of this tool. Use on your own behalf. I’m also not responsible if your accounts get banned due to extensive use of this tool.
@@ -22,7 +22,8 @@ Head over to https://github.com/timgrossmann/InstaPy/wiki/Reporting-An-Issue to 
 
 ### Social
 
-#### [Slack Workspace](https://join.slack.com/t/instapy/shared_invite/enQtMjYzNTgwMDg3MDEyLTk2NWI0MjY2MTVjYmM2NjFlYjVmMmE0ZjU1OGQ0OWM2MTQwOTc1NTIyOGVhZDEwMTFkYzFmODE5ZWIxZjhjMTQ) | [InstaPy Twitter](https://twitter.com/InstaPy) | [My Twitter](https://twitter.com/timigrossmann) | [How it works (Medium)](https://medium.freecodecamp.com/my-open-source-instagram-bot-got-me-2-500-real-followers-for-5-in-server-costs-e40491358340) | [Check out the talk](https://youtu.be/4TmKFZy-ioQ) | [Support InstaPy!](https://www.paypal.me/supportInstaPy)
+#### [Slack Workspace](https://join.slack.com/t/instapy/shared_invite/enQtMjYzNTgwMDg3MDEyLTk2NWI0MjY2MTVjYmM2NjFlYjVmMmE0ZjU1OGQ0OWM2MTQwOTc1NTIyOGVhZDEwMTFkYzFmODE5ZWIxZjhjMTQ) | [InstaPy Twitter](https://twitter.com/InstaPy) | [My Twitter](https://twitter.com/timigrossmann) | [How it works (Medium)](https://medium.freecodecamp.com/my-open-source-instagram-bot-got-me-2-500-real-followers-for-5-in-server-costs-e40491358340) | [Check out the talk](https://youtu.be/4TmKFZy-ioQ) |
+[Listen to the "Talk Python to me"-Episode](https://talkpython.fm/episodes/show/142/automating-the-web-with-selenium-and-instapy) | [Support InstaPy!](https://www.paypal.me/supportInstaPy)
 
 [![paypal](https://img.shields.io/badge/-PayPal-blue.svg)](https://www.paypal.me/supportInstaPy)
 
@@ -53,12 +54,17 @@ Table of Contents
   * [Ignoring Restrictions](#ignoring-restrictions)
   * [Excluding friends](#excluding-friends)
   * [Blacklist Campaign](#blacklist-campaign)
+  * [Smart Hashtags](#smart-hashtags)
   * [Follow/Unfollow/exclude not working?](#followunfollowexclude-not-working)
+  * [Bypass Suspicious Login Attempt](#bypass-suspicious-login-attempt)
 * [Third Party InstaPy GUI for Windows](#third-party-instapy-gui-for-windows)
+* [Use a proxy](#use-a-proxy)
 * [Switching to Firefox](#switching-to-firefox)
 * [Emoji Support](#emoji-support)
 * [Clarifai ImageAPI](#clarifai-imageapi)
 * [Running on a Server](#running-on-a-server)
+* [Running on a Headless Browser](#running-on-a-headless-browser)
+* [Running Multiple Accounts](#running-multiple-accounts)
 * [Running with Docker microservices manual](#running-with-docker-microservices-manual)
 * [Running all-in-one with Docker (obsolete)](#running-all-in-one-with-docker-obsolete)
 * [Automate with cron](#automate-with-cron)
@@ -69,6 +75,8 @@ Table of Contents
 
 ### Video tutorials:
 **[Setting up InstaPy for OSX](https://www.youtube.com/watch?v=I025CEBJCvQ)**
+
+**[Setting up InstaPy at Digital Ocean (for Debian)](https://www.youtube.com/watch?v=2Ci-hXU1IEY)**
 
 ### Guides:
 **[How to Ubuntu (64-Bit)](./docs/How_To_DO_Ubuntu_on_Digital_Ocean.md) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**
@@ -86,7 +94,7 @@ Table of Contents
 or
 3. python setup.py install
 ```
-4. Download ```chromedriver``` for your system [from here](https://sites.google.com/a/chromium.org/chromedriver/downloads). And put it in ```/assets``` folder.
+4. Download ```chromedriver``` for your system [from here](https://sites.google.com/a/chromium.org/chromedriver/downloads). Extract the .zip file and put it in ```/assets``` folder.
 
 ### Set it up yourself with this Basic Setup
 
@@ -98,7 +106,7 @@ from instapy import InstaPy
 insta_username = ''
 insta_password = ''
 
-# if you want to run this script on a server, 
+# if you want to run this script on a server,
 # simply add nogui=True to the InstaPy() constructor
 session = InstaPy(username=insta_username, password=insta_password)
 session.login()
@@ -147,12 +155,17 @@ session.set_comments(['Awesome', 'Really Cool', 'I like your stuff'])
 
 session.set_comments(['Nice shot!'], media='Photo')
 session.set_comments(['Great Video!'], media='Video')
+
+# and you can add the username of the poster to the comment by using
+
+session.set_comments(['Nice shot! @{}'], media='Photo')
 ```
+
 
 ### Following
 
 ```python
-# default enabled=False, follows ~ 10% of the users from the images, times=1 
+# default enabled=False, follows ~ 10% of the users from the images, times=1
 # (only follows a user once (if unfollowed again))
 
 session.set_do_follow(enabled=True, percentage=10, times=2)
@@ -162,8 +175,8 @@ session.set_do_follow(enabled=True, percentage=10, times=2)
 
 ```python
 # follows each account from a list of instagram nicknames (only follows a user
-# once (if unfollowed again)) would be useful for the precise targeting. 
-# For example, if one needs to get followbacks from followers of a chosen 
+# once (if unfollowed again)) would be useful for the precise targeting.
+# For example, if one needs to get followbacks from followers of a chosen
 # account/group of accounts.
 
 accs = ['therock','natgeo']
@@ -176,14 +189,14 @@ session.follow_by_list(accs, times=1)
 # Follows the followers of each given user
 # The usernames can be either a list or a string
 # The amount is for each account, in this case 30 users will be followed
-# If random is false it will pick in a top-down fashion
+# If randomize is false it will pick in a top-down fashion
 
-session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, random=False)
+session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, randomize=False)
 
 # default sleep_delay=600 (10min) for every 10 user following, in this case
-# sleep for 60 seconds  
+# sleep for 60 seconds
 
-session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, random=False, sleep_delay=60)
+session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, randomize=False, sleep_delay=60)
 ```
 
 ### Follow users that someone else is following
@@ -192,14 +205,14 @@ session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, rand
 # Follows the people that a given users are following
 # The usernames can be either a list or a string
 # The amount is for each account, in this case 30 users will be followed
-# If random is false it will pick in a top-down fashion
+# If randomize is false it will pick in a top-down fashion
 
-session.follow_user_following(['friend1', 'friend2', 'friend3'], amount=10, random=False)
+session.follow_user_following(['friend1', 'friend2', 'friend3'], amount=10, randomize=False)
 
 # default sleep_delay=600 (10min) for every 10 user following, in this case
 # sleep for 60 seconds
 
-session.follow_user_following(['friend1', 'friend2', 'friend3'], amount=10, random=False, sleep_delay=60)
+session.follow_user_following(['friend1', 'friend2', 'friend3'], amount=10, randomize=False, sleep_delay=60)
 ```
 
 ### Follow someone else's followers/following
@@ -210,8 +223,16 @@ session.follow_user_following(['friend1', 'friend2', 'friend3'], amount=10, rand
 # Take into account the other set options like the comment rate
 # and the filtering for inappropriate words or users
 
-session.set_user_interact(amount=5, random=True, percentage=50, media='Photo')
-session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, random=False, interact=True)
+session.set_user_interact(amount=5, randomize=True, percentage=50, media='Photo')
+session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, randomize=False, interact=True)
+```
+
+### Follow by Tags
+
+```python
+# Follow user based on hashtags (without liking the image)
+
+session.follow_by_tags(['tag1', 'tag2'], amount=10)
 ```
 
 ### Interact with specific users
@@ -223,7 +244,7 @@ session.set_do_follow(enabled=False, percentage=50)
 session.set_comments(["Cool", "Super!"])
 session.set_do_comment(enabled=True, percentage=80)
 session.set_do_like(True, percentage=70)
-session.interact_by_users(['user1', 'user2', 'user3'], amount=5, random=True, media='Photo')
+session.interact_by_users(['user1', 'user2', 'user3'], amount=5, randomize=True, media='Photo')
 ```
 
 ### Interact with users that someone else is following
@@ -231,12 +252,12 @@ session.interact_by_users(['user1', 'user2', 'user3'], amount=5, random=True, me
 # Interact with the people that a given user is following
 # set_do_comment, set_do_follow and set_do_like are applicable
 
-session.set_user_interact(amount=5, random=True, percentage=50, media='Photo')
+session.set_user_interact(amount=5, randomize=True, percentage=50, media='Photo')
 session.set_do_follow(enabled=False, percentage=70)
 session.set_do_like(enabled=False, percentage=70)
 session.set_comments(["Cool", "Super!"])
 session.set_do_comment(enabled=True, percentage=80)
-session.interact_user_following(['natgeo'], amount=10, random=True)
+session.interact_user_following(['natgeo'], amount=10, randomize=True)
 ```
 
 ### Interact with someone else's followers
@@ -244,30 +265,35 @@ session.interact_user_following(['natgeo'], amount=10, random=True)
 # Interact with the people that a given user is following
 # set_do_comment, set_do_follow and set_do_like are applicable
 
-session.set_user_interact(amount=5, random=True, percentage=50, media='Photo')
+session.set_user_interact(amount=5, randomize=True, percentage=50, media='Photo')
 session.set_do_follow(enabled=False, percentage=70)
 session.set_do_like(enabled=False, percentage=70)
 session.set_comments(["Cool", "Super!"])
 session.set_do_comment(enabled=True, percentage=80)
-session.interact_user_followers(['natgeo'], amount=10, random=True)
+session.interact_user_followers(['natgeo'], amount=10, randomize=True)
 ```
 
 ### Unfollowing
 
 ```python
-# unfollows 10 of the accounts you're following -> instagram will only 
-# unfollow 10 before you'll be 'blocked for 10 minutes' (if you enter a 
-# higher number than 10 it will unfollow 10, then wait 10 minutes and will 
+# unfollows 10 of the accounts you're following -> instagram will only
+# unfollow 10 before you'll be 'blocked for 10 minutes' (if you enter a
+# higher number than 10 it will unfollow 10, then wait 10 minutes and will
 # continue then).
 # You can choose to only unfollow the user that Insta has followed by adding
 # onlyInstapyFollowed = True otherwise it will unfollow all users
-# You can choose unfollow method as FIFO (First-Input-First-Output) or 
-# LIFO (Last-Input-First-Output). The default is FIFO method. 
+# You can choose unfollow method as FIFO (First-Input-First-Output) or
+# LIFO (Last-Input-First-Output). The default is FIFO method.
 # onlyInstapyMethod is using only when onlyInstapyFollowed = True
 # sleep_delay sets the time it will sleep every 10 profile unfollow, default
 # is 10min
 
 session.unfollow_users(amount=10, onlyInstapyFollowed = True, onlyInstapyMethod = 'FIFO', sleep_delay=60 )
+
+# You can only unfollow user that won't follow you back by adding
+# onlyNotFollowMe = True it still only support on profile following
+# you should disable onlyInstapyFollowed when use this
+session.unfollow_users(amount=10, onlyNotFollowMe=True, sleep_delay=60)
 ```
 
 ### Don't unfollow active users
@@ -275,13 +301,13 @@ session.unfollow_users(amount=10, onlyInstapyFollowed = True, onlyInstapyMethod 
 ```python
 # Prevents unfollow followers who have liked one of your latest 5 posts
 
-session.set_dont_unfollow_active_users(enabled=False, posts=5)
+session.set_dont_unfollow_active_users(enabled=True, posts=5)
 ```
 
 ### Interactions based on the number of followers a user has
 
 ```python
-# This is used to check the number of followers a user has and if this number 
+# This is used to check the number of followers a user has and if this number
 # exceeds the number set then no further interaction happens
 
 session.set_upper_follower_count(limit = 250)
@@ -321,14 +347,22 @@ Example:
 session.like_by_tags(['natgeo', 'world'], amount=10)
 ```
 
+### Like by Tags and interact with user
+
+```python
+# Like posts based on hashtags and like 3 posts of its poster
+session.set_user_interact(amount=3, randomize=True, percentage=100, media='Photo')
+session.like_by_tags(['natgeo', 'world'], amount=10, interact=True)
+```
+
 ### Like by Feeds
 
 ```python
 # This is used to perform likes on your own feeds
 # amount=100  specifies how many total likes you want to perform
-# random=True randomly skips posts to be liked on your feed
-# unfollow=True unfollows the author of a post which was considered 
-# inappropriate interact=True visits the author's profile page of a 
+# randomize=True randomly skips posts to be liked on your feed
+# unfollow=True unfollows the author of a post which was considered
+# inappropriate interact=True visits the author's profile page of a
 # certain post and likes a given number of his pictures, then returns to feed
 
 session.like_by_feed(amount=100, randomize=True, unfollow=True, interact=True)
@@ -338,7 +372,7 @@ session.like_by_feed(amount=100, randomize=True, unfollow=True, interact=True)
 ```python
 # Controls your interactions by campaigns.
 # ex. this week InstaPy will like and comment interacting by campaign called
-# 'soccer', next time InstaPy runs, it will not interact again with users in 
+# 'soccer', next time InstaPy runs, it will not interact again with users in
 # blacklist
 # In general, this means that once we turn off the soccer_campaign again, InstaPy
 # will have no track of the people it interacted with about soccer.
@@ -351,13 +385,27 @@ session.like_by_tags(['soccer', 'cr7', 'neymar'], amount=100, media='Photo')
 
 ```
 
+### Smart Hashtags
+
+```python
+# Generate smart hashtags based on https://displaypurposes.com ranking,
+# banned and spammy tags are filtered out.
+# (limit) defines amount limit of generated hashtags by hashtag
+# (sort) sort generated hashtag list 'top' and 'random' are available
+# (log_tags) shows generated hashtags before use it
+# (use_smart_hashtags) activates like_by_tag to use smart hashtags
+
+session.set_smart_hashtags(['cycling', 'roadbike'], limit=3, sort='top', log_tags=True)
+session.like_by_tags(amount=10, use_smart_hashtags=True)
+```
+
 ### Restricting Likes
 
 ```python
-session.set_dont_like('#exactmatch', '[startswith', ']endswith', 'broadmatch')
+session.set_dont_like(['#exactmatch', '[startswith', ']endswith', 'broadmatch'])
 ```
 
-`.set_dont_like` searches the description and owner comments for hashtags and 
+`.set_dont_like` searches the description and owner comments for hashtags and
 won't like the image if one of those hashtags are in there
 
 You have 4 options to exclude posts from your InstaPy session:
@@ -386,7 +434,7 @@ session.set_ignore_if_contains(['glutenfree', 'french', 'tasty'])
 ### Excluding friends
 
 ```python
-# will prevent commenting on and unfollowing your good friends (the images will 
+# will prevent commenting on and unfollowing your good friends (the images will
 # still be liked)
 
 session.set_dont_include(['friend1', 'friend2', 'friend3'])
@@ -399,7 +447,29 @@ session.set_do_follow(enabled=True, percentage=10, times=2)
 ```
 but none of the profiles are being followed - or any such functionality is misbehaving - then one thing you should check is the position/order of such methods in your script. Essentially, all the ```set_*``` methods have to be before ```like_by_tags``` or ```like_by_locations``` or ```unfollow```. This is also implicit in all the exmples and quickstart.py
 
-## Switching to Firefox
+### Bypass Suspicious Login Attempt
+
+If you're having issues with the "we detected an unusual login attempt" message,
+you can bypass it setting InstaPy in this way:
+
+```python
+session = InstaPy(username=insta_username, password=insta_password, bypass_suspicious_attempt=True)
+```
+
+```bypass_suspicious_attempt=True``` will send the verification code to your
+email, and you will be prompted to enter the security code sent to your email.
+It will login to your account, now you can set bypass_suspicious_attempt to False
+```bypass_suspicious_attempt=False``` and InstaPy will quickly login using cookies.
+
+### Use a proxy
+
+You can use InstaPy behind a proxy by specifying server address and port
+
+```python
+session = InstaPy(username=insta_username, password=insta_password, proxy_address='8.8.8.8', proxy_port=8080)
+```
+
+### Switching to Firefox
 
 Chrome is the default browser, but InstaPy provides support for Firefox as well.
 
@@ -418,10 +488,10 @@ session.set_comments([u'Emoji text codes are also supported :100: :thumbsup: :th
 
 Emoji text codes are implemented using 2 different naming codes. A complete list of emojis codes can be found on the [Python Emoji Github](https://github.com/carpedm20/emoji/blob/master/emoji/unicode_codes.py), but you can use the alternate shorted naming scheme found for Emoji text codes [here](https://www.webpagefx.com/tools/emoji-cheat-sheet). Note: Every Emoji has not been tested. Please report any inconsistencies.
 
-> **Legacy Emoji Support**  
+> **Legacy Emoji Support**
 >
 > You can still use Unicode strings in your comments, but there are some limitations.
-> 1. You can use only Unicode characters with no more than 4 characters and you have to use the unicode code (e. g. ```\u1234```). You find a list of emoji with unicode codes on [Wikipedia](https://en.wikipedia.org/wiki/Emoji#Unicode_blocks), but there is also a list of working emoji in ```/assets```  
+> 1. You can use only Unicode characters with no more than 4 characters and you have to use the unicode code (e. g. ```\u1234```). You find a list of emoji with unicode codes on [Wikipedia](https://en.wikipedia.org/wiki/Emoji#Unicode_blocks), but there is also a list of working emoji in ```/assets```
 >
 > 2. You have to convert your comment to Unicode. This can safely be done by adding an u in front of the opening apostrophe: ```u'\u1234 some comment'```
 
@@ -451,7 +521,7 @@ session.end()
 
 ```python
 # default enabled=False , enables the checking with the clarifai api (image
-# tagging) if secret and proj_id are not set, it will get the environment 
+# tagging) if secret and proj_id are not set, it will get the environment
 # variables 'CLARIFAI_API_KEY'
 
 session.set_use_clarifai(enabled=True, api_key='xxx')
@@ -482,6 +552,23 @@ Use the `nogui` parameter to interact with virtual display
 
 ```
 session = InstaPy(username='test', password='test', nogui=True)
+```
+
+## Running on a Headless Browser
+
+**Note:** Chrome only! Must user chromedriver v2.9+
+
+Use `headless_browser` parameter to run the bot via the CLI. Works great if running the scripts locally, or to deploy on a server. No GUI, less CPU intensive. [Example](http://g.recordit.co/BhEgXANLhJ.gif)
+
+```
+session = InstaPy(username='test', password='test', headless_browser=True)
+```
+
+## Running Multiple Accounts
+
+Use the multi_logs parameter if you are going to use multiple accounts and want the log files stored per account.
+```
+session = InstaPy(username='test', password='test', multi_logs=True)
 ```
 
 ## Running with Docker microservices manual
@@ -579,8 +666,8 @@ You can add InstaPy to your crontab, so that the script will be executed regular
 # Edit or create a crontab
 crontab -e
 # Add information to execute your InstaPy regularly.
-# With cd you navigate to your InstaPy folder, with the part after && 
-# you execute your quickstart.py with python. Make sure that those paths match 
+# With cd you navigate to your InstaPy folder, with the part after &&
+# you execute your quickstart.py with python. Make sure that those paths match
 # your environment.
 45 */4 * * * cd /home/user/InstaPy && /usr/bin/python ./quickstart.py
 ```
@@ -632,4 +719,3 @@ Built-in delays prevent your account from getting banned. (Just make sure you do
 ---
 ###### Have Fun & Feel Free to report any issues
 ---
-
